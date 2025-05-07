@@ -1,7 +1,7 @@
 //import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import debounce from 'lodash/debounce';
 import { toast } from 'sonner';
+import  InertiaPagination from '@/components/inertia-pagination';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,6 +21,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface LinksType {
+    url: string;
+    label: string;
+    active: boolean;
+}
 interface PostType {
     id: number;
     title: string;
@@ -27,11 +34,19 @@ interface PostType {
     status: string;
     image: string;
 }
+interface PostsType {
+    data: PostType[];
+    links: LinksType[];
+    from: number;
+    to: number;
+    total: number;
+}
 
-export default function Dashboard({ posts }: {posts: PostType[] }) {
+export default function Dashboard({ posts }: {posts: PostsType }) {
 
     const {flash} = usePage<{ flash: { message?: string}}>().props;
-    console.log(posts);
+    //если в контроллере есть пагинация, добавляется posts.data
+    //console.log(posts.data);
 
     useEffect(() => {
         if (flash.message) {
@@ -39,6 +54,27 @@ export default function Dashboard({ posts }: {posts: PostType[] }) {
             toast.success(flash.message);
         }
     }, [flash.message]);
+
+    // search functional (search engine)
+    const handleSearch = useRef(
+        debounce((query: string) => {
+            router.get('/posts', {search: query}, {preserveState: true, replace: true});
+        }, 500),
+    ).current;
+
+    // search method (method call search engine)
+    function  onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const query = e.target.value;
+        handleSearch(query);
+    }
+
+    // delete post
+    function deletePost(id: number) {
+        if (confirm('Are you sure you want to delete this post ?')) {
+            router.delete(`/posts/${id}`);
+            //toast.success('Post deleted successfully');
+        }
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -48,7 +84,12 @@ export default function Dashboard({ posts }: {posts: PostType[] }) {
                     <div className="flex items-center justify-between mb-5">
                         <div className="relative w-full sm:w-1/3">
                             {/* time 1:16:05 */}
-                            <Input id={'search'} className="peer ps-9" placeholder="Search..." type="search" />
+                            <Input id={'search'}
+                                   className="peer ps-9"
+                                   placeholder="Search..."
+                                   type="search"
+                                   onChange={onSearchChange}
+                            />
                             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
                                 <Search size={16} aria-hidden="true" />
                             </div>
@@ -76,7 +117,7 @@ export default function Dashboard({ posts }: {posts: PostType[] }) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {posts.map((post, index) => (
+                                    {posts.data.map((post, index) => (
                                         <TableRow key={ post.id }>
                                             <TableCell>{ index + 1 }</TableCell>
                                             <TableCell>
@@ -97,7 +138,7 @@ export default function Dashboard({ posts }: {posts: PostType[] }) {
                                                         Edit
                                                     </Link>
                                                 </Button>
-                                                <Button size={'sm'} variant="destructive">
+                                                <Button onClick={() => deletePost(post.id)} size={'sm'} variant="destructive">
                                                     Delete
                                                 </Button>
                                             </TableCell>
@@ -108,6 +149,7 @@ export default function Dashboard({ posts }: {posts: PostType[] }) {
                         </CardContent>
                     </Card>
 
+                    <InertiaPagination posts={posts} />
                 </div>
             </div>
         </AppLayout>

@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,30 +19,44 @@ import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create Post',
-        href: '/create/posts',
+        title: 'Edit Post',
+        href: '/posts',
     },
 ];
 
-export default function Dashboard() {
+interface PostDataType {
+    id: number;
+    title: string;
+    content: string;
+    category: string;
+    status: string;
+    image: string;
+}
 
-    const {data, setData, post, errors, processing} = useForm<{
+export default function Dashboard({postData}: {postData: PostDataType}) {
+
+    const {data, setData, processing} = useForm<{
         title: string,
         category: string,
         status: string,
         content: string,
         image: File | null;
     }>({
-        title: '',
-        category: '',
-        status: '',
-        content: '',
+        title: postData.title,
+        category: postData.category,
+        status: postData.status,
+        content: postData.content,
         image: null,
     });
 
+    const { errors } = usePage().props;
+
     function handleFormSubmit(e: React.FormEvent) {
         e.preventDefault();
-        post('/posts');
+        router.post(`/posts/${postData.id}`, {
+            _method: 'put',
+            ...data,
+        });
     }
 
     return (
@@ -51,7 +65,7 @@ export default function Dashboard() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="rounded border p-6 shadow-xl">
                     <div className="mb-5 flex items-center justify-between">
-                        <div className="text-xl text-slate-600">Create Post</div>
+                        <div className="text-xl text-slate-600">Edit Post</div>
 
                         <Button>
                             <Link href="/posts" prefetch>
@@ -93,9 +107,9 @@ export default function Dashboard() {
 
                                     <div className="col-span-2 md:col-span-1">
                                         <Label htmlFor="category">Status</Label>
-                                        <Select value={data.status} onValueChange={(e) => setData('status', e)}>
+                                        <Select value={data.status == '1' ? '1' : '0'} onValueChange={(e) => setData('status', e)}>
                                             <SelectTrigger id="status" aria-invalid={!!errors.category}>
-                                                <SelectValue placeholder="Select Status" />
+                                                <SelectValue>{data.status == '1' ? 'Active' : 'Inactive'}</SelectValue>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="1">Active</SelectItem>
@@ -133,14 +147,21 @@ export default function Dashboard() {
                                         aria-invalid={!!errors.image}
                                     />
                                     <InputError message={errors.image} />
-                                    { data.image && <img src={URL.createObjectURL(data.image)}
-                                        alt="Preview" className="mt-2 h-24 object-cover rounded-xl" /> }
+
+                                    {/* data.image && (
+                                        <img src={URL.createObjectURL(data.image)} alt="Preview" className="mt-2 h-24 object-cover rounded-xl" />
+                                    ) ??? */}
+
+
+                                    { postData.image && (
+                                        <img src={`/storage/${postData.image}`} alt="Old Image Preview" className="mt-2 h-24 object-cover rounded-xl" />
+                                    )}
                                 </div>
 
                                 <div className="mt-4 text-end">
                                     <Button size={'lg'} type="submit" disabled={processing}>
                                         { processing && <Loader2 className="animate-spin" /> }
-                                        <span>Create Post</span>
+                                        <span>Update Post</span>
                                     </Button>
                                 </div>
                             </form>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -13,10 +14,15 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //$posts = Auth::user()->posts()->latest()->get();
-        $posts = Post::all();
+        $query = Post::query()->orderBy('created_at', 'desc');
+        if ($request->has('search') && $request->search !== null) {
+            $query->whereAny(['title','content'], 'like', '%'.$request->search.'%');
+        }
+        $posts = $query->paginate(5)->toArray();
+
         return Inertia::render('posts/index', [
             'posts' => $posts,
         ]);
@@ -55,7 +61,7 @@ class PostController extends Controller
         Post::create($data);
 
         // time 55:50 install flash
-        return redirect()->route('posts.index')->with('message','Post created successfully.');
+        return to_route('posts.index')->with('message','Post created successfully.');
     }
 
     /**
@@ -71,7 +77,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return inertia()->render('posts/edit', ['postData' => $post]);
     }
 
     /**
@@ -79,7 +85,27 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        //dd($request);
+        $data = $request->validate([
+            'title' => ['required','string','min:3','max:255'],
+            'content' => ['required','string'],
+            'status' => ['required','string'],
+            'category' => ['required','string'],
+            'image' => ['nullable','image','max:2048'],
+        ]);
+
+        $filePath = $post->image;
+        if ($request->has('image') && $request->image !== null) {
+            $file = $request->file('image');
+            $filePath = $file->store('posts', 'public');
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $data['image'] = $filePath;
+        $data['slug'] = Str::slug($data['title']);
+        $post->update($data);
+
+        return to_route('posts.index')->with('message','Post updated successfully.');
     }
 
     /**
@@ -87,6 +113,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->delete();
+
+        return to_route('posts.index')->with('message','Post deleted successfully.');
     }
 }
