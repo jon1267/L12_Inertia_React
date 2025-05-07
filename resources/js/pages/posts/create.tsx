@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from 'lucide-react';
+import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,16 +68,19 @@ export default function Dashboard() {
                                         <Label htmlFor="title">Title</Label>
                                         <Input
                                             type="text"
+                                            id="title"
                                             placeholder="Enter Post Title"
                                             value={data.title}
                                             onChange={(e) => setData('title', e.target.value)}
+                                            aria-invalid={!!errors.title}
                                         />
+                                        <InputError message={errors.title} />
                                     </div>
 
                                     <div className="col-span-2 md:col-span-1">
                                         <Label htmlFor="category">Category</Label>
-                                        <Select value={data.category} onValueChange={(e) => setData('category', e)}>
-                                            <SelectTrigger id="category">
+                                        <Select value={data.category} onValueChange={(e) => setData('category', e)} >
+                                            <SelectTrigger id="category" aria-invalid={!!errors.category}>
                                                 <SelectValue placeholder="Select Category" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -84,12 +88,13 @@ export default function Dashboard() {
                                                 <SelectItem value="DC">DC</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.category} />
                                     </div>
 
                                     <div className="col-span-2 md:col-span-1">
                                         <Label htmlFor="category">Status</Label>
                                         <Select value={data.status} onValueChange={(e) => setData('status', e)}>
-                                            <SelectTrigger id="status">
+                                            <SelectTrigger id="status" aria-invalid={!!errors.category}>
                                                 <SelectValue placeholder="Select Status" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -97,6 +102,7 @@ export default function Dashboard() {
                                                 <SelectItem value="0">Inactive</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.status} />
                                     </div>
                                 </div>
 
@@ -108,7 +114,9 @@ export default function Dashboard() {
                                         placeholder="Type content here..."
                                         value={data.content}
                                         onChange={(e) => setData('content', e.target.value)}
+                                        aria-invalid={!!errors.content}
                                     />
+                                    <InputError message={errors.content} />
                                 </div>
                                 <div className="mt-4">
                                     <Label htmlFor="image">Image</Label>
@@ -122,7 +130,11 @@ export default function Dashboard() {
                                                 setData('image', file);
                                             }
                                         }}
+                                        aria-invalid={!!errors.image}
                                     />
+                                    <InputError message={errors.image} />
+                                    { data.image && <img src={URL.createObjectURL(data.image)}
+                                        alt="Preview" className="mt-2 h-24 object-cover rounded-xl" /> }
                                 </div>
 
                                 <div className="mt-4 text-end">

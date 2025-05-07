@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -13,7 +15,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        return Inertia::render('posts/index');
+        //$posts = Auth::user()->posts()->latest()->get();
+        $posts = Post::all();
+        return Inertia::render('posts/index', [
+            'posts' => $posts,
+        ]);
     }
 
     /**
@@ -30,12 +36,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
-        /*$request->validate([
-            'title' => 'required',
-            'content' => 'required',
-            // time 45:30
-        ]);*/
+        //dd($request->all());
+        $data = $request->validate([
+            'title' => ['required','string','min:3','max:255'],
+            'content' => ['required','string'],
+            'status' => ['required','string'],
+            'category' => ['required','string'],
+            'image' => ['required','image','max:2048'],
+        ]);
+
+        $file = $request->file('image');
+        $filePath = $file->store('posts', 'public');
+        $data['image'] = $filePath;
+        $data['user_id'] = auth()->user()?->id;
+        $data['slug'] = Str::slug($data['title']);
+        //dd($data);
+
+        Post::create($data);
+
+        // time 55:50 install flash
+        return redirect()->route('posts.index')->with('message','Post created successfully.');
     }
 
     /**
