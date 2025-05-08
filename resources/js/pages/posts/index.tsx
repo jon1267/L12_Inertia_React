@@ -4,7 +4,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search,  Pencil, Trash2, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -133,13 +133,23 @@ export default function Dashboard({ posts }: {posts: PostsType }) {
                                                     <Badge className="bg-green-500">Active</Badge> }
                                             </TableCell>
                                             <TableCell className="space-x-1">
-                                                <Button asChild size={'sm'}>
+                                                {/*<Button asChild size={'sm'}>
                                                     <Link href={`/posts/${post.id}/edit`} prefetch>
                                                         Edit
                                                     </Link>
                                                 </Button>
                                                 <Button onClick={() => deletePost(post.id)} size={'sm'} variant="destructive">
                                                     Delete
+                                                </Button>*/}
+                                                <Button variant="ghost"  size="icon" className="hover:bg-primary/10 hover:text-primary">
+                                                    <Link href={`/posts/${post.id}/edit`} prefetch>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="ghost" onClick={() => deletePost(post.id)}
+                                                        size="icon"  className="hover:bg-destructive/10 hover:text-destructive"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
