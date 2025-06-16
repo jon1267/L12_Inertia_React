@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, NotebookPenIcon } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, NotebookPenIcon, ClipboardList, ListTodo } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -17,6 +17,16 @@ const mainNavItems: NavItem[] = [
         title: 'Posts',
         url: '/posts',
         icon: NotebookPenIcon,
+    },
+    {
+        title: 'Lists',
+        url: '/lists',
+        icon: ClipboardList,
+    },
+    {
+        title: 'Tasks',
+        url: '/tasks',
+        icon: ListTodo,
     },
 ];
 

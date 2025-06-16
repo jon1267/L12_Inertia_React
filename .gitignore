@@ -18,6 +18,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/work
 auth.json
 Homestead.json
 Homestead.yaml

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ListController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,6 +16,7 @@ Route::middleware(['auth'])->group(function () {
 
     // time 14:05
     Route::resource('posts', PostController::class);
+    Route::resource('lists', ListController::class);
 });
 
 require __DIR__.'/settings.php';
