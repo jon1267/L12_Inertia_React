@@ -3,15 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Models\Task;
+use App\Models\Lists;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Task::with('lists')
+            ->whereHas('lists', function ($query) {
+                $query->where('user_id', auth()->id());
+            })->orderBy('created_at', 'desc');
+
+        // handle search functionality
+        if ($request->has('search') && $request->search !== null) {
+            $search = $request->search;
+            // time 50:00
+        }
     }
 
     /**

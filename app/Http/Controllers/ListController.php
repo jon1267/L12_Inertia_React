@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lists;
-use Illuminate\Http\Request;
+use App\Http\Requests\Taskslists\ListCreateRequest; //use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ListController extends Controller
@@ -17,6 +17,7 @@ class ListController extends Controller
         return Inertia::render('lists/index', [
             'lists' => $lists,
             'flash' => [
+                'message' => session('message'),
                 'success' => session('success'),
                 'error' => session('error'),
             ],
@@ -34,14 +35,9 @@ class ListController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ListCreateRequest $request)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'max:4096'],
-        ]);
-        $validated['user_id'] = auth()->id();
+         $validated = $request->validated();
 
         Lists::create($validated);
 
@@ -67,13 +63,9 @@ class ListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Lists $list)
+    public function update(ListCreateRequest $request, Lists $list)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'max:4096'],
-        ]);
+        $validated = $request->validated();
 
         $list->update($validated);
 
