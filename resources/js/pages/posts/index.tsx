@@ -83,7 +83,6 @@ export default function Dashboard({ posts }: {posts: PostsType }) {
                 <div className="rounded border p-6 shadow-xl">
                     <div className="flex items-center justify-between mb-5">
                         <div className="relative w-full sm:w-1/3">
-                            {/* time 1:16:05 */}
                             <Input id={'search'}
                                    className="peer ps-9"
                                    placeholder="Search..."

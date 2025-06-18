@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use  App\Http\Requests\Taskslists\TaskCreateRequest;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Task;
 use App\Models\Lists;
@@ -15,7 +16,6 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        //dd($request);
         $query = Task::with('lists')
             ->whereHas('lists', function ($query) {
                 $query->where('user_id', auth()->id());
@@ -26,18 +26,16 @@ class TaskController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%');
+                  ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
 
-        if ($request->has('filter') && $request->filter !== null) {
+        if ($request->has('filter') && $request->filter !== null && in_array($request->filter, ['completed', 'pending'])) {
             $query->where('is_completed', $request->filter === 'completed');
         }
 
         $tasks = $query->paginate(10);
         $lists = Lists::where('user_id', auth()->id())->get();
-        //dd($tasks, $lists);
-        // time 1:24:00 не работают фильтры и поиск (images не отображаются)
 
         return Inertia::render('tasks/index', [
             'tasks' => $tasks,
@@ -68,6 +66,12 @@ class TaskController extends Controller
     {
         $validated = $request->validated();
 
+        if ($request->has('image') && $request->image !== null) {
+            $file = $request->file('image');
+            $filePath = $file->store('tasks', 'public');
+            $validated['image'] = 'storage/'.$filePath;
+        }
+
         Task::create($validated);
 
         return to_route('tasks.index')->with('message', 'Task created successfully.');
@@ -95,6 +99,14 @@ class TaskController extends Controller
     public function update(TaskCreateRequest $request, Task $task)
     {
         $validated = $request->validated();
+
+        $filePath = $task->image;
+        if ($request->has('image') && $request->image !== null) {
+            $file = $request->file('image');
+            $filePath = $file->store('tasks', 'public');
+            Storage::disk('public')->delete($task->image);
+        }
+        $validated['image'] = 'storage/'.$filePath;
 
         $task->update($validated);
 

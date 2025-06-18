@@ -143,9 +143,9 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
         destroy(route('tasks.destroy', task.id));
     };
 
-    // time 1:07:30
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log('Search term:', searchTerm, 'filter', completionFilter);
         router.get(route('tasks.index'), {
             search: searchTerm,
             filter: completionFilter,
@@ -251,6 +251,9 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                     </Select>
                                 </div>
 
+                                {/*
+                                Show image in modal, damage request data && update data not work.
+                                In create new task, image showed and save ok ... for update need fix
                                 <div className="space-y-2">
                                     <Label htmlFor="image">Image</Label>
                                     <Input type="file" id="image" placeholder="Image for List"
@@ -266,6 +269,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                     {data.image && <img src={URL.createObjectURL(data.image)}
                                             alt="Preview" className="mt-2 h-24 object-cover rounded-xl" /> }
                                 </div>
+                                */}
 
                                 <div className="space-y-2">
                                     <Label htmlFor="due_date">Due Date</Label>{' '}
@@ -299,6 +303,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                         <Input placeholder="Search tasks..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
                     </form>
+
                     <Select value={completionFilter} onValueChange={handleFilterChange}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Filter by status" />
