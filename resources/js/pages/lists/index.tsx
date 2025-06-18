@@ -13,7 +13,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import error from 'eslint-plugin-react/lib/util/error';
 
 interface List {
     id: number;
@@ -74,7 +73,7 @@ export default function Lists({ lists, flash }: Props) {
     const {data, setData, post, put, errors, processing, reset, delete: destroy} = useForm({
         title: '',
         description: '',
-        image: null as File | null,
+        //image: null as File | null,
     });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -103,7 +102,7 @@ export default function Lists({ lists, flash }: Props) {
         setData({
             'title': list.title,
             'description': list.description || '',
-            'image': null, // Reset image field when editing
+            //'image': null, // Reset image field when editing
         });
         setIsOpen(true);
     };
@@ -151,7 +150,7 @@ export default function Lists({ lists, flash }: Props) {
                                     <InputError message={errors.description} />
                                 </div>
 
-                                <div className="space-y-2">
+                                {/*<div className="space-y-2">
                                     <Label htmlFor="image">Image</Label>
                                     <Input type="file" id="image" placeholder="Image for List"
                                         onChange={(e) => {
@@ -165,7 +164,7 @@ export default function Lists({ lists, flash }: Props) {
 
                                     { data.image && <img src={URL.createObjectURL(data.image)}
                                          alt="Preview" className="mt-2 h-24 object-cover rounded-xl" /> }
-                                </div>
+                                </div>*/}
 
                                 <Button type="submit" disabled={processing}>
                                     {editingList ? 'Update' : 'Create'}
